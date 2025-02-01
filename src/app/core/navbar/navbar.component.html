@@ -1,4 +1,7 @@
-<button mat-button [routerLink]="['/transactions']">Transactions</button>
-<button mat-button [routerLink]="['**']">Paycheck</button>
-<button mat-button [routerLink]="['**']">Budget</button>
-<button mat-button [routerLink]="['**']">Other</button>
+<nav class="navbar">
+  <button class="nav-button" [routerLink]="['/transactions']">Transactions</button>
+  <button class="nav-button" [routerLink]="['/paycheck']">Paycheck</button>
+  <button class="nav-button" [routerLink]="['/budget']">Budget</button>
+  <button class="nav-button" [routerLink]="['/other']">Other</button>
+</nav>
+

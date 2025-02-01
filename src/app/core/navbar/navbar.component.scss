@@ -1,0 +1,29 @@
+.navbar {
+  display: flex;
+  justify-content: left;
+  background-color: #2C3E50;
+  padding: 10px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+}
+
+.nav-button {
+  background-color: #34495E;
+  color: #ECF0F1;
+  font-size: 16px;
+  padding: 10px 20px;
+  margin: 0 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #16A085;
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
