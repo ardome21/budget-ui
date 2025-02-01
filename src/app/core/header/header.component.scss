@@ -1,0 +1,20 @@
+header {
+  display: flex;
+  align-items: center; // Aligns logo and title vertically
+  padding: 10px 20px;
+  background-color: #e6dda5; // Light background for contrast
+
+  img {
+    width: 50px;
+    height: 50px; // Ensures a square logo
+    object-fit: contain; // Keeps aspect ratio
+    margin-right: 20px;
+  }
+
+  p {
+    font-size: 1.5rem; // Adjust to match logo height
+    font-weight: bold;
+    margin: 0;
+    line-height: 50px; // Matches the logo height
+  }
+}
