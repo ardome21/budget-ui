@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -7,13 +7,8 @@ import { CommonModule } from '@angular/common';
   templateUrl: './transactions-table.component.html',
   styleUrl: './transactions-table.component.scss'
 })
-export class TransactionsTableComponent implements OnInit {
+export class TransactionsTableComponent {
 
   @Input()
   transactionData: any[] = []
-
-  ngOnInit(): void {
-    console.log(this.transactionData);
-  }
-
 }
