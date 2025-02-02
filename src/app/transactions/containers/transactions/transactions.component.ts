@@ -18,7 +18,6 @@ export class TransactionsComponent implements OnInit {
   ngOnInit(): void {
     this._transactionService.getTransactionData().subscribe((data) => {
       this.transactionData = data;
-      console.log(this.transactionData)
     })
   }
 

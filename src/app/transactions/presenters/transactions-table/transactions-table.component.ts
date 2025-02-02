@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
+import { Transaction } from '../../../models/transaction';
 
 
 @Component({
@@ -11,7 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 })
 export class TransactionsTableComponent {
   @Input()
-  transactionData: any[] = []
+  transactionData: Transaction[] = []
 
-  displayedColumns: string[] = ['date', 'description', 'amount'];
+  tableColumns: string[] = ['date', 'description', 'amount'];
 }
