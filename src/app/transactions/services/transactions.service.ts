@@ -10,9 +10,7 @@ export class TransactionsService {
   constructor(private _transactionApi: TransactionApiService) { }
 
   getTransactionData(): Observable<any> {
-    return this._transactionApi.getData().pipe(
-      tap(data => console.log('From Service: ', data))
-    );
+    return this._transactionApi.getData();
   }
 
 }
