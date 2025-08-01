@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { TransactionData } from '../types/transaction-data';
 
 @Injectable({
@@ -8,13 +8,18 @@ import { TransactionData } from '../types/transaction-data';
 })
 export class TransactionApiService {
 
-  private apiUrl = '/api';
-
-  constructor(private _http: HttpClient) { }
+  constructor() { }
 
   getData(): Observable<TransactionData[]> {
-    return this._http.get<TransactionData[]>(`${this.apiUrl}/transactions`);
-    // return this._http.get('http:///localhost:8080/transactions');
+    return of([ {
+      id: 1,
+      date: 'Date',
+      transactionItem: {
+          amount: 1,
+          category: 'category',
+          description: 'description'
+      }
 
+    }])
   }
 }
