@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class PlaidApiService {
 
   createLink = 'https://saxtr05tma.execute-api.us-east-1.amazonaws.com/default/budget-create-plaid-link'
-  exchangeToken = 'https://1h4jaufl6l.execute-api.us-east-1.amazonaws.com/default/budget-exchange-plaid-token'
+  exchangeToken = 'https://fadqo69lu2.execute-api.us-east-1.amazonaws.com/default/budget-exchange-plaid-token'
 
   constructor(private http: HttpClient) { }
 

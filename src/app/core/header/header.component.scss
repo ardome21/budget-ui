@@ -1,6 +1,7 @@
 header {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Pushes left and right items to edges */
   padding: 10px 20px;
   background-color: #e6dda5;
 
@@ -11,10 +12,27 @@ header {
     margin-right: 20px;
   }
 
-  p {
+  p.title {
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
     line-height: 50px;
+    flex-grow: 1; /* Ensures it takes up available space */
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    button {
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+    }
   }
 }
