@@ -8,7 +8,7 @@ declare var Plaid: any;
 })
 export class PlaidService {
 
-  userId: string = 'unique_user_id_123';
+  userId: string = 'unique_user_id_123'; // TODO: Get User ID from User service
 
   constructor(private plaidApi: PlaidApiService) {}
 

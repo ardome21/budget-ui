@@ -48,28 +48,35 @@
       </div>
     </div>
 
-    <!-- First Name Field (Optional) -->
     <div class="form-group">
-      <label for="firstName">First Name:</label>
+      <label for="firstName">First Name:<span class="required">*</span></label>
       <input
         type="text"
         id="firstName"
         formControlName="firstName"
         class="form-control"
+        [class.is-invalid]="isFieldInvalid('firstName')"
         placeholder="Enter your first name (optional)"
       >
+      <div class="error-message" *ngIf="isFieldInvalid('firstName')">
+        {{ getFieldError('firstName') }}
+      </div>
     </div>
 
     <!-- Last Name Field (Optional) -->
     <div class="form-group">
-      <label for="lastName">Last Name:</label>
+      <label for="lastName">Last Name:<span class="required">*</span></label>
       <input
         type="text"
         id="lastName"
         formControlName="lastName"
         class="form-control"
+        [class.is-invalid]="isFieldInvalid('lastName')"
         placeholder="Enter your last name (optional)"
       >
+      <div class="error-message" *ngIf="isFieldInvalid('lastName')">
+        {{ getFieldError('lastName') }}
+      </div>
     </div>
 
     <!-- Submit Button -->
@@ -82,12 +89,6 @@
       <span *ngIf="!isLoading">Create Profile</span>
       <span *ngIf="isLoading">Creating...</span>
     </button>
-
-    <!-- Success/Error Messages -->
-    <div class="message" *ngIf="message" [class.success]="isSuccess" [class.error]="!isSuccess">
-      {{ message }}
-    </div>
-
   </form>
 
 

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import { NavbarComponent } from "../navbar/navbar.component";
 import { CreateAccountDialogComponent } from '../create-account-dialog/create-account-dialog.component';
+import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
 
 @Component({
   selector: 'app-header',
@@ -18,6 +19,13 @@ export class HeaderComponent {
       event.target.blur();
     }
     this.dialog.open(CreateAccountDialogComponent);
+  }
+
+  openLoginDialog(event?: Event): void {
+    if (event && event.target instanceof HTMLElement) {
+      event.target.blur();
+    }
+    this.dialog.open(LoginDialogComponent);
   }
 
 }
