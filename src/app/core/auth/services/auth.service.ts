@@ -31,9 +31,7 @@ export class AuthService {
   createUser(
     userData: UserData
   ): Observable<{message: string, user: UserData, success: string}> {
-    return this._authApiService.createUser(userData).pipe(
-
-    );
+    return this._authApiService.createUser(userData)
   }
 
   login(
@@ -43,7 +41,6 @@ export class AuthService {
       tap(res => {
         const userProfile = this._authAdapterService.fromData(res.user);
         this._userProfile.next(userProfile);
-        sessionStorage.setItem('user', JSON.stringify(userProfile));
       })
     );
   }
@@ -51,7 +48,6 @@ export class AuthService {
   logout(): void {
     this._authApiService.logout().subscribe(() => {
       this._userProfile.next(null);
-      sessionStorage.removeItem('user');
     });
   }
 
@@ -61,10 +57,8 @@ export class AuthService {
           if (res.success === 'true') {
             const userProfile = this._authAdapterService.fromData(res.userData);
             this._userProfile.next(userProfile);
-            sessionStorage.setItem('user', JSON.stringify(userProfile));
           } else {
             this._userProfile.next(null);
-            sessionStorage.removeItem('user');
           }
       }),
       map(res => res.success === 'true'
@@ -73,7 +67,6 @@ export class AuthService {
       ),
       catchError(() => {
         this._userProfile.next(null);
-        sessionStorage.removeItem('user');
         return of(null);
       })
     );
