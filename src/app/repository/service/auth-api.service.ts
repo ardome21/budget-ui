@@ -6,7 +6,7 @@ import { UserData } from '../types/user-data';
 @Injectable({
   providedIn: 'root'
 })
-export class UserApiService {
+export class AuthApiService {
 
   private signupApi = 'https://o1hqoxlb2i.execute-api.us-east-1.amazonaws.com/default/budget-signup'
   private loginApi = 'https://ssovvyy0h7.execute-api.us-east-1.amazonaws.com/default/budget-login'

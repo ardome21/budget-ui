@@ -1,4 +1,3 @@
-// confirmation-success.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,8 +26,6 @@ export class ConfirmationSuccessComponent implements OnInit {
   }
 
   goToLogin() {
-    this.router.navigate(['/login'], {
-      queryParams: { email: this.userEmail }
-    });
+    this.router.navigate(['/']);
   }
 }

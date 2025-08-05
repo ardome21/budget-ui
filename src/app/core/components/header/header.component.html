@@ -1,7 +1,7 @@
 <header>
   <img class="logo" src="assets/header-logo.png" alt="logo">
   <p class="title">Budget Application</p>
-  <ng-container *ngIf="isAuthChecked; else loading">
+  <ng-container *ngIf="authChecked$ | async as isAuthChecked; else authLoading">
     <div class="user-section">
       <div *ngIf="userProfile$ | async as userProfile; else loggedOut" class="logged-in">
         <span class="welcome-text">Welcome, {{ userProfile.firstName }}!</span>
@@ -15,7 +15,7 @@
       <button (click)="openCreateAccountDialog($event)" class="signup-btn">Sign Up</button>
     </div>
   </ng-template>
-  <ng-template #loading>
+  <ng-template #authLoading>
     <div class="loading">
       <span>Loading...</span>
     </div>

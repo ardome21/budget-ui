@@ -1,9 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
-import { UserProfile } from '../../models/user-profile';
-import { UserApiService as AuthApiService } from '../../repository/service/auth-api.service';
-import { UserAdapterService as AuthAdapterService } from '../adapters/user-adapter.service';
-import { UserData } from '../../repository/types/user-data';
+import { BehaviorSubject, catchError, map, Observable, of, ReplaySubject, tap } from 'rxjs';
+import { UserAdapterService } from '../adapters/user-adapter.service';
+import { UserProfile } from '../../../models/user-profile';
+import { UserData } from '../../../repository/types/user-data';
+import { AuthApiService } from '../../../repository/service/auth-api.service';
 ;
 
 @Injectable({
@@ -14,12 +14,12 @@ export class AuthService {
   private _userProfile = new BehaviorSubject<UserProfile | null>(null);
   public userProfile$ = this._userProfile.asObservable();
 
-  private _authChecked = new BehaviorSubject<boolean>(false);
+  private _authChecked = new ReplaySubject<boolean>(1);
   public authChecked$ = this._authChecked.asObservable();
 
 
-  private _authApiService = inject(AuthApiService)
-  private _authAdapterService = inject(AuthAdapterService)
+  private _authApiService = inject(AuthApiService);
+  private _authAdapterService = inject(UserAdapterService)
 
   constructor() {
     this.checkAuthStatus().subscribe({
