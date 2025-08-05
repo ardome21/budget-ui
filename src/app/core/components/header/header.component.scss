@@ -35,4 +35,37 @@ header {
       font-size: 1rem;
     }
   }
+  .user-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .logged-in {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+
+      .welcome-text {
+        font-size: 1rem;
+        margin: 0;
+      }
+
+      .logout-btn {
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+    }
+
+    .logged-out {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .login-btn,
+      .signup-btn {
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+    }
+  }
 }

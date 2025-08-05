@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from "./core/header/header.component";
+import { HeaderComponent } from "./core/components/header/header.component";
 import { PlaidApiService } from './repository/service/plaid-api.service';
 
 @Component({

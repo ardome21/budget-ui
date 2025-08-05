@@ -1,4 +1,4 @@
-<h1>Create Profile</h1>
+<h1>Login</h1>
 <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="profile-form">
   <div class="form-group">
       <label for="email">Email: <span class="required">*</span></label>
@@ -37,7 +37,7 @@
       [disabled]="isLoading"
       [class.loading]="isLoading"
     >
-      <span *ngIf="!isLoading">Create Profile</span>
-      <span *ngIf="isLoading">Creating...</span>
+      <span *ngIf="!isLoading">Login</span>
+      <span *ngIf="isLoading">Login...</span>
     </button>
 </form>

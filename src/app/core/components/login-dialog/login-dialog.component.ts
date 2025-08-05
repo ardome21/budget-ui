@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { UserService } from '../user.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login-dialog',
@@ -18,7 +18,7 @@ export class LoginDialogComponent {
   isLoading = false;
   isSuccess = false;
 
-  _userService = inject(UserService)
+  _userService = inject(AuthService)
 
   constructor() {
     this.profileForm = new FormGroup({
@@ -56,11 +56,11 @@ export class LoginDialogComponent {
       this.dialogRef.close()
     },
     error: (error) => {
-      console.error('Error creating user:', error.error);
+      console.error('Error Loggin in:', error.error);
       this.isLoading = false;
     },
     complete: () => {
-      console.log('User creation request completed');
+      console.log('User login completed');
     }
   });
 
@@ -85,7 +85,6 @@ export class LoginDialogComponent {
       if (field.errors['required']) return `${fieldName} is required`;
       if (field.errors['email']) return 'Please enter a valid email';
       if (field.errors['minlength']) return `${fieldName} must be at least ${field.errors['minlength'].requiredLength} characters`;
-      if (field.errors['passwordMismatch']) return 'Passwords do not match';
     }
     return '';
   }

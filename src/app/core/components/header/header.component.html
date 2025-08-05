@@ -1,0 +1,24 @@
+<header>
+  <img class="logo" src="assets/header-logo.png" alt="logo">
+  <p class="title">Budget Application</p>
+  <ng-container *ngIf="isAuthChecked; else loading">
+    <div class="user-section">
+      <div *ngIf="userProfile$ | async as userProfile; else loggedOut" class="logged-in">
+        <span class="welcome-text">Welcome, {{ userProfile.firstName }}!</span>
+        <button (click)="logout()" class="logout-btn">Logout</button>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #loggedOut>
+    <div class="logged-out">
+      <button (click)="openLoginDialog($event)" class="login-btn">Login</button>
+      <button (click)="openCreateAccountDialog($event)" class="signup-btn">Sign Up</button>
+    </div>
+  </ng-template>
+  <ng-template #loading>
+    <div class="loading">
+      <span>Loading...</span>
+    </div>
+  </ng-template>
+</header>
+<app-navbar></app-navbar>

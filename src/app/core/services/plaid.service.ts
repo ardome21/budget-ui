@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PlaidApiService } from '../repository/service/plaid-api.service';
+import { PlaidApiService } from '../../repository/service/plaid-api.service';
 
 declare var Plaid: any;
 

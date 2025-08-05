@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormGroup, Validators, FormControl, ValidatorFn, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { UserService } from '../user.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-create-account-dialog',
@@ -17,7 +17,7 @@ export class CreateAccountDialogComponent {
   isLoading = false;
   isSuccess = false;
 
-  _userService = inject(UserService)
+  _userService = inject(AuthService)
 
   constructor() {
     this.profileForm = new FormGroup({
@@ -60,8 +60,8 @@ export class CreateAccountDialogComponent {
     const userData = {
       email: this.f['email'].value,
       password: this.f['password'].value,
-      firstName: this.f['firstName'].value,
-      lastName: this.f['lastName'].value
+      first_name: this.f['firstName'].value,
+      last_name: this.f['lastName'].value
     };
 
     this._userService.createUser(userData).subscribe({

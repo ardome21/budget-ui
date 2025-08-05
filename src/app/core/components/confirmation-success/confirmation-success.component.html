@@ -1,0 +1,17 @@
+    <div class="confirmation-container">
+      <div class="success-card" *ngIf="!alreadyConfirmed">
+        <h1>✅ Email Confirmed!</h1>
+        <p>Welcome {{userEmail}}! Your account is now active.</p>
+        <button (click)="goToLogin()" class="login-btn">
+          Continue to Login
+        </button>
+      </div>
+
+      <div class="info-card" *ngIf="alreadyConfirmed">
+        <h1>Email Already Confirmed</h1>
+        <p>Your account was already verified. You can log in below.</p>
+        <button (click)="goToLogin()" class="login-btn">
+          Go to Login
+        </button>
+      </div>
+    </div>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { PlaidService } from '../core/plaid.service';
+import { PlaidService } from '../core/services/plaid.service';
 
 @Component({
   selector: 'app-home',
