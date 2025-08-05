@@ -22,7 +22,6 @@ launchPlaidLink(onComplete: (accessToken: string) => void): void {
           onSuccess: (public_token: string, metadata: any) => {
             this.plaidApi.exchangePublicToken(public_token).subscribe({
               next: (exchange) => {
-                console.log('✅ Access Token:', exchange.access_token);
                 onComplete(exchange.access_token);
               },
               error: (err: any) => console.error('Token exchange failed:', err)

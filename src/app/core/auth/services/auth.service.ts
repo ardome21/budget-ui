@@ -52,19 +52,14 @@ export class AuthService {
     this._authApiService.logout().subscribe(() => {
       this._userProfile.next(null);
       sessionStorage.removeItem('user');
-      console.log('User logged out');
     });
   }
 
   checkAuthStatus(): Observable<UserProfile | null> {
-    console.log('Checking authentication status...');
     return this._authApiService.verifyAuth().pipe(
       tap((res) => {
-          console.log('Auth verification response:', res);
           if (res.success === 'true') {
-            console.log('User is authenticated:', res.userData);
             const userProfile = this._authAdapterService.fromData(res.userData);
-            console.log('User profile:', userProfile);
             this._userProfile.next(userProfile);
             sessionStorage.setItem('user', JSON.stringify(userProfile));
           } else {

@@ -44,16 +44,7 @@ export class AuthApiService {
   }
 
   logout(): Observable<{ success: string; message: string }> {
-    return this.http.post<{ success: string; message: string }>(this.logoutApi, {}, { withCredentials: true }).pipe(
-      tap(() => {
-        console.log('Logout completed, checking cookies...');
-        console.log('Document cookies:', document.cookie);
-      })
-    );
-    // return this.http.post<{ success: string, message: string}>(
-    //   this.logoutApi,
-    //   { withCredentials: true }
-    // );
+    return this.http.post<{ success: string; message: string }>(this.logoutApi, {}, { withCredentials: true });
   }
 
   verifyAuth(): Observable<{message: string; userData: UserData; success: string}> {

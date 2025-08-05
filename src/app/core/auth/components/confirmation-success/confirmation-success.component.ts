@@ -22,7 +22,6 @@ export class ConfirmationSuccessComponent implements OnInit {
       this.userEmail = params['email'] || '';
       this.alreadyConfirmed = params['already_confirmed'] === 'true';
     });
-    console.log("User email: ", this.userEmail)
   }
 
   goToLogin() {

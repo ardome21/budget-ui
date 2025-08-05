@@ -1,17 +1,21 @@
 import { Component, inject } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
+
 @Component({
   selector: 'app-login-dialog',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,],
   templateUrl: './login-dialog.component.html',
   styleUrl: './login-dialog.component.scss'
 })
 export class LoginDialogComponent {
   readonly dialogRef = inject(MatDialogRef<LoginDialogComponent>);
+  private snackBar = inject(MatSnackBar);
 
 
   profileForm: FormGroup;
@@ -31,39 +35,28 @@ export class LoginDialogComponent {
 
 
     onSubmit() {
-    if (this.profileForm.invalid) {
-      this.markFormGroupTouched();
-      return;
-    }
-
-    this.isLoading = true;
-
-    const loginData = {
-      email: this.f['email'].value,
-      password: this.f['password'].value
-    };
-
-    this._userService.login(loginData).subscribe({
-    next: (response) => {
-      console.log('User Login successful:', response);
-      if (response.success) {
-        console.log(response.message);
-
-        this.profileForm.reset();
+      if (this.profileForm.invalid) {
+        this.markFormGroupTouched();
+        return;
       }
-
-      this.isLoading = false;
-      this.dialogRef.close()
-    },
-    error: (error) => {
-      console.error('Error Loggin in:', error.error);
-      this.isLoading = false;
-    },
-    complete: () => {
-      console.log('User login completed');
-    }
-  });
-
+      this.isLoading = true;
+      const loginData = {
+        email: this.f['email'].value,
+        password: this.f['password'].value
+      };
+      this._userService.login(loginData).subscribe({
+      next: () => {
+        this.snackBar.open('Login successful!', 'Close', { duration: 3000, panelClass: 'snackbar-success' });
+        this.dialogRef.close()
+      },
+      error: (res) => {
+        this.isLoading = false;
+        this.snackBar.open('Login failed: ' + res.error.error, 'Close', {
+          duration: 3000,
+          panelClass: 'snackbar-error'
+        });
+      }
+    });
   }
 
   private markFormGroupTouched() {

@@ -4,13 +4,13 @@ import { NavbarComponent } from "../navbar/navbar.component";
 import { CreateAccountDialogComponent } from '../../auth/components/create-account-dialog/create-account-dialog.component';
 import { LoginDialogComponent } from '../../auth/components/login-dialog/login-dialog.component';
 import { CommonModule } from '@angular/common';
-import { filter, Observable, take } from 'rxjs';
-import { UserProfile } from '../../../models/user-profile';
 import { AuthService } from '../../auth/services/auth.service';
+import { MatIconModule } from "@angular/material/icon";
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-header',
-  imports: [NavbarComponent, CommonModule],
+  imports: [NavbarComponent, CommonModule, MatButtonModule, MatIconModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -20,21 +20,6 @@ export class HeaderComponent{
 
   userProfile$ = this._userService.userProfile$;
   authChecked$ = this._userService.authChecked$;
-
-  // userProfile$!: Observable<UserProfile | null>
-  // isAuthChecked = false;
-
-  // ngOnInit(): void {
-  //   this.userProfile$ = this._userService.userProfile$;
-  //   this._userService.authChecked$
-  //     .pipe(
-  //       filter(val => val === true),
-  //       take(1)
-  //     )
-  //     .subscribe(() => {
-  //       this.isAuthChecked = true;
-  //     });
-  // }
 
   openCreateAccountDialog(event?: Event): void {
     if (event && event.target instanceof HTMLElement) {
@@ -52,6 +37,7 @@ export class HeaderComponent{
 
   logout(): void {
     this._userService.logout();
+
   }
 
 }

@@ -11,8 +11,12 @@
   </ng-container>
   <ng-template #loggedOut>
     <div class="logged-out">
-      <button (click)="openLoginDialog($event)" class="login-btn">Login</button>
-      <button (click)="openCreateAccountDialog($event)" class="signup-btn">Sign Up</button>
+      <button (click)="openLoginDialog($event)" class="login-btn" matFab extended>
+        Login
+      </button>
+      <button (click)="openCreateAccountDialog($event)" class="signup-btn" matFab extended>
+        Sign Up
+      </button>
     </div>
   </ng-template>
   <ng-template #authLoading>

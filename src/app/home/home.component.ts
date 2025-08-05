@@ -14,7 +14,6 @@ export class HomeComponent {
   connectBank() {
     this.plaid.launchPlaidLink((accessToken: string) => {
       console.log('🎉 Received Plaid access token:', accessToken);
-      // TODO: Store in state or fetch transactions
     });
   }
 
