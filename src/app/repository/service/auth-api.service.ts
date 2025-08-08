@@ -9,8 +9,9 @@ import { UserData } from '../types/user-data';
 export class AuthApiService {
 
   private signupApi = 'https://o1hqoxlb2i.execute-api.us-east-1.amazonaws.com/default/budget-signup'
-  private loginApi = 'https://ssovvyy0h7.execute-api.us-east-1.amazonaws.com/default/budget-login'
-  private logoutApi = 'https://ssovvyy0h7.execute-api.us-east-1.amazonaws.com/default/budget-logout'
+  private loginApi = 'https://7b118ya72b.execute-api.us-east-1.amazonaws.com/login'
+  private logoutApi = 'https://7b118ya72b.execute-api.us-east-1.amazonaws.com/budget-logout'
+
   constructor(private http: HttpClient) { }
 
   createUser(
