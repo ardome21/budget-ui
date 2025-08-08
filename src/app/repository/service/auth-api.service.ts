@@ -10,7 +10,6 @@ export class AuthApiService {
 
   private signupApi = 'https://o1hqoxlb2i.execute-api.us-east-1.amazonaws.com/default/budget-signup'
   private loginApi = 'https://ssovvyy0h7.execute-api.us-east-1.amazonaws.com/default/budget-login'
-  private verifyAuthApi = 'https://ssovvyy0h7.execute-api.us-east-1.amazonaws.com/default/budget-verify-auth'
   private logoutApi = 'https://ssovvyy0h7.execute-api.us-east-1.amazonaws.com/default/budget-logout'
   constructor(private http: HttpClient) { }
 
@@ -43,13 +42,14 @@ export class AuthApiService {
     );
   }
 
+  verifyAuth(): Observable<{message: string; userData: UserData; success: string}> {
+    return this.http.get<{message: string; userData: UserData; success: string}>(
+      this.loginApi, { withCredentials: true }
+     );
+  }
+
   logout(): Observable<{ success: string; message: string }> {
     return this.http.post<{ success: string; message: string }>(this.logoutApi, {}, { withCredentials: true });
   }
 
-  verifyAuth(): Observable<{message: string; userData: UserData; success: string}> {
-    return this.http.get<{message: string; userData: UserData; success: string}>(
-      this.verifyAuthApi, { withCredentials: true }
-     );
-  }
 }
