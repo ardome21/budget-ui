@@ -32,15 +32,26 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=.aws/terraform init
 
-      - name: Debug Terraform outputs
-        run: terraform -chdir=.aws/terraform output
+      - name: Validate Terraform config
+        run: terraform -chdir=.aws/terraform validate
+
+      - name: Check Terraform state and outputs
+        run: |
+          echo "Listing Terraform state files:"
+          ls -l .aws/terraform
+          terraform -chdir=.aws/terraform state list || echo "No state found yet"
+          terraform -chdir=.aws/terraform output || echo "No outputs found yet"
 
       - name: Get Terraform outputs
         id: tf
         run: |
-          BUCKET=$(terraform -chdir=.aws/terraform output -raw frontend_bucket_name)
-          DIST_ID=$(terraform -chdir=.aws/terraform output -raw cloudfront_distribution_id)
-          DOMAIN=$(terraform -chdir=.aws/terraform output -raw cloudfront_domain_name) # if you have this output
+          BUCKET=$(terraform -chdir=.aws/terraform output -raw frontend_bucket_name || echo "")
+          DIST_ID=$(terraform -chdir=.aws/terraform output -raw cloudfront_distribution_id || echo "")
+          DOMAIN=$(terraform -chdir=.aws/terraform output -raw cloudfront_domain_name || echo "")
+          if [ -z "$BUCKET" ] || [ -z "$DIST_ID" ]; then
+            echo "ERROR: Terraform outputs missing or empty. Check previous steps."
+            exit 1
+          fi
           echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
           echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
           echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
@@ -60,4 +71,5 @@ jobs:
           AWS_REGION: us-east-1
 
       - name: Show deployed URL
+        if: success() && steps.tf.outputs.domain != ''
         run: echo "Frontend deployed at https://${{ steps.tf.outputs.domain }}"
