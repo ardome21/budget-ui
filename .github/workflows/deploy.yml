@@ -120,7 +120,7 @@ jobs:
         ls -la "$BUILD_DIR"
         
         # Verify index.html exists
-        if [ ! -f "$BUILD_DIR/index.html" ]; then
+        if [ ! -f "$BUILD_DIR/browser/index.html" ]; then
           echo "❌ index.html not found in $BUILD_DIR"
           echo "Contents:"
           find "$BUILD_DIR" -name "*.html" | head -5
