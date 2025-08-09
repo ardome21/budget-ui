@@ -1,75 +1,87 @@
-name: Deploy Angular Frontend
+name: Deploy Angular App to AWS
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]  # Change to your default branch if different
+  workflow_dispatch:  # Allows manual triggering
+
+env:
+  NODE_VERSION: '18'  # Adjust based on your Angular version requirements
+  AWS_REGION: 'us-east-1'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.7
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+    - name: Install dependencies
+      run: npm ci
 
-      - name: Install dependencies
-        run: npm ci
+    - name: Build Angular app
+      run: npm run build --prod
 
-      - name: Build Angular
-        run: npm run prod
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Init
-        run: terraform -chdir=.aws/terraform init
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ~1.3
+        terraform_wrapper: false
 
-      - name: Validate Terraform config
-        run: terraform -chdir=.aws/terraform validate
+    - name: Terraform Init
+      run: terraform init
+      working-directory: .aws/terraform
 
-      - name: Check Terraform state and outputs
-        run: |
-          echo "Listing Terraform state files:"
-          ls -l .aws/terraform
-          terraform -chdir=.aws/terraform state list || echo "No state found yet"
-          terraform -chdir=.aws/terraform output || echo "No outputs found yet"
+    - name: Terraform Plan
+      run: terraform plan
+      working-directory: .aws/terraform
 
-      - name: Get Terraform outputs
-        id: tf
-        run: |
-          BUCKET=$(terraform -chdir=.aws/terraform output -raw frontend_bucket_name || echo "")
-          DIST_ID=$(terraform -chdir=.aws/terraform output -raw cloudfront_distribution_id || echo "")
-          DOMAIN=$(terraform -chdir=.aws/terraform output -raw cloudfront_domain_name || echo "")
-          if [ -z "$BUCKET" ] || [ -z "$DIST_ID" ]; then
-            echo "ERROR: Terraform outputs missing or empty. Check previous steps."
-            exit 1
-          fi
-          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
-          echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
-          echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: .aws/terraform
 
-      - name: Upload to S3
-        run: aws s3 sync dist/budget-ui/ s3://${{ steps.tf.outputs.bucket }} --delete
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+    - name: Get Terraform outputs
+      id: terraform
+      run: |
+        echo "bucket_name=$(terraform output -raw bucket_name)" >> $GITHUB_OUTPUT
+        echo "cloudfront_distribution_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
+      working-directory: .aws/terraform
 
-      - name: Invalidate CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ steps.tf.outputs.dist_id }} --paths "/*"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+    - name: Sync files to S3
+      run: |
+        aws s3 sync dist/ s3://${{ steps.terraform.outputs.bucket_name }} \
+          --delete \
+          --cache-control "public,max-age=31536000,immutable" \
+          --exclude "*.html" \
+          --exclude "*.json"
+        
+        # Upload HTML and JSON files with different cache settings
+        aws s3 sync dist/ s3://${{ steps.terraform.outputs.bucket_name }} \
+          --cache-control "public,max-age=0,must-revalidate" \
+          --include "*.html" \
+          --include "*.json"
 
-      - name: Show deployed URL
-        if: success() && steps.tf.outputs.domain != ''
-        run: echo "Frontend deployed at https://${{ steps.tf.outputs.domain }}"
+    - name: Invalidate CloudFront cache
+      run: |
+        aws cloudfront create-invalidation \
+          --distribution-id ${{ steps.terraform.outputs.cloudfront_distribution_id }} \
+          --paths "/*"
+
+    - name: Deployment complete
+      run: |
+        echo "🚀 Deployment successful!"
+        echo "Your app should be available at: https://$(terraform output -raw cloudfront_domain)"
