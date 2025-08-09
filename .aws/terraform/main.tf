@@ -1,14 +1,3 @@
-resource "aws_s3_bucket" "frontend" {
-  bucket        = "my-angular-spa"
-  force_destroy = true
-}
-
-resource "aws_s3_bucket_website_configuration" "frontend" {
-  bucket = aws_s3_bucket.frontend.id
-  index_document { suffix = "index.html" }
-  error_document { key = "index.html" } # SPA routing
-}
-
 resource "aws_cloudfront_distribution" "frontend" {
   origin {
     domain_name = aws_s3_bucket.frontend.bucket_regional_domain_name
@@ -33,6 +22,12 @@ resource "aws_cloudfront_distribution" "frontend" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
 }
 
 output "frontend_bucket_name" {
@@ -41,4 +36,8 @@ output "frontend_bucket_name" {
 
 output "cloudfront_distribution_id" {
   value = aws_cloudfront_distribution.frontend.id
+}
+
+output "cloudfront_domain_name" {
+  value = aws_cloudfront_distribution.frontend.domain_name
 }
