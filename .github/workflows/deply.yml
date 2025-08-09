@@ -29,24 +29,32 @@ jobs:
       - name: Build Angular
         run: npm run prod
 
-      - name: Get Terraform outputs
-        id: tf
-        run: |
-          BUCKET=$(terraform -chdir=.aws/terraform output -raw frontend_bucket_name)
-          DIST_ID=$(terraform -chdir=.aws/terraform output -raw cloudfront_distribution_id)
-          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
-          echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
+      - name: Terraform Init
+        run: terraform -chdir=.aws/terraform init
 
-      - name: Upload to S3
-        run: aws s3 sync dist/budget-ui/ s3://${{ steps.tf.outputs.bucket }} --delete
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+      - name: Debug Terraform outputs
+        run: terraform -chdir=.aws/terraform output
 
-      - name: Invalidate CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ steps.tf.outputs.dist_id }} --paths "/*"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+      # Uncomment the below 'Get Terraform outputs' step once debugging is done and outputs work
+      # - name: Get Terraform outputs
+      #   id: tf
+      #   run: |
+      #     BUCKET=$(terraform -chdir=.aws/terraform output -raw frontend_bucket_name)
+      #     DIST_ID=$(terraform -chdir=.aws/terraform output -raw cloudfront_distribution_id)
+      #     echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+      #     echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
+
+      # # If the above works, use this Upload and Invalidate steps
+      # - name: Upload to S3
+      #   run: aws s3 sync dist/budget-ui/ s3://${{ steps.tf.outputs.bucket }} --delete
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_REGION: us-east-1
+
+      # - name: Invalidate CloudFront cache
+      #   run: aws cloudfront create-invalidation --distribution-id ${{ steps.tf.outputs.dist_id }} --paths "/*"
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_REGION: us-east-1
