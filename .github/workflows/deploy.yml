@@ -2,14 +2,13 @@ name: Deploy Angular App to AWS
 
 on:
   push:
-    branches: [main]  # Change to your default branch if different
-  workflow_dispatch:  # Allows manual triggering
+    branches: [main]
+  workflow_dispatch:
 
 env:
-  NODE_VERSION: '18'  # Adjust based on your Angular version requirements
+  NODE_VERSION: '18'
   AWS_REGION: 'us-east-1'
-  # Terraform variables
-  TF_VAR_bucket_name: 'my-angular-app-dev-v2'
+  TF_VAR_bucket_name: 'my-angular-app-dev-1
 
 jobs:
   deploy:
@@ -25,43 +24,10 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build Angular app
+    - name: Install and build
       run: |
-        echo "📦 Building Angular app..."
-        # Try different build commands
-        if npm run build 2>/dev/null; then
-          echo "✅ Built with npm run build"
-        elif npx ng build 2>/dev/null; then
-          echo "✅ Built with ng build"  
-        elif npm run build:prod 2>/dev/null; then
-          echo "✅ Built with npm run build:prod"
-        else
-          echo "❌ No valid build command found"
-          echo "Available scripts in package.json:"
-          cat package.json | grep -A 10 '"scripts"' || echo "No scripts section found"
-          exit 1
-        fi
-      
-    - name: Check build output
-      run: |
-        echo "🔍 Checking build output..."
-        ls -la
-        if [ -d "dist" ]; then
-          echo "✅ dist folder found"
-          ls -la dist/
-          # Check if there are subdirectories in dist
-          if [ "$(find dist -mindepth 1 -maxdepth 1 -type d | wc -l)" -gt 0 ]; then
-            echo "📁 Subdirectories in dist:"
-            find dist -mindepth 1 -maxdepth 1 -type d
-          fi
-        else
-          echo "❌ dist folder not found - checking for other build outputs"
-          find . -name "*.html" -o -name "*.js" -o -name "*.css" | head -10
-          exit 1
-        fi
+        npm ci
+        npm run build
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -76,100 +42,15 @@ jobs:
         terraform_version: ~1.3
         terraform_wrapper: false
 
-    - name: Terraform Init
-      run: terraform init
+    - name: Deploy infrastructure
+      run: |
+        terraform init
+        terraform apply -auto-approve
       working-directory: .aws/terraform
 
-    - name: Terraform Plan
-      run: terraform plan
+    - name: Upload to S3
+      run: |
+        BUCKET_NAME=$(terraform output -raw bucket_name)
+        aws s3 sync dist/ s3://$BUCKET_NAME --delete
+        echo "Deployed to: $BUCKET_NAME"
       working-directory: .aws/terraform
-
-    - name: Terraform Apply
-      run: terraform apply -auto-approve
-      working-directory: .aws/terraform
-
-    - name: Get Terraform outputs
-      id: terraform
-      run: |
-        echo "bucket_name=$(terraform output -raw bucket_name)" >> $GITHUB_OUTPUT
-        echo "cloudfront_distribution_id=$(terraform output -raw cloudfront_distribution_id)" >> $GITHUB_OUTPUT
-        echo "cloudfront_domain=$(terraform output -raw cloudfront_domain)" >> $GITHUB_OUTPUT
-      working-directory: .aws/terraform
-
-    - name: Sync files to S3
-      run: |
-        echo "🚀 Deploying to S3..."
-        
-        # Find the correct dist folder
-        if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
-          # Check if there's a subdirectory in dist (common with newer Angular)
-          SUBDIRS=$(find dist -mindepth 1 -maxdepth 1 -type d)
-          if [ -n "$SUBDIRS" ] && [ $(echo "$SUBDIRS" | wc -l) -eq 1 ]; then
-            PROJECT_DIR="$SUBDIRS"
-            echo "📁 Found Angular project directory: $PROJECT_DIR"
-            # Check if there's a browser subdirectory (Angular 17+)
-            if [ -d "$PROJECT_DIR/browser" ]; then
-              BUILD_DIR="$PROJECT_DIR/browser"
-              echo "📁 Using browser subdirectory: $BUILD_DIR"
-            else
-              BUILD_DIR="$PROJECT_DIR"
-              echo "📁 Using project directory: $BUILD_DIR"
-            fi
-          else
-            BUILD_DIR="dist"
-            echo "📁 Using dist directory: $BUILD_DIR"
-          fi
-        else
-          echo "❌ No build output found in dist/"
-          exit 1
-        fi
-        
-        echo "📋 Build directory contents:"
-        ls -la "$BUILD_DIR"
-        
-        # Verify index.html exists
-        if [ ! -f "$BUILD_DIR/index.html" ]; then
-          echo "❌ index.html not found in $BUILD_DIR"
-          echo "Contents:"
-          find "$BUILD_DIR" -name "*.html" | head -5
-          exit 1
-        fi
-        
-        echo "✅ index.html found, proceeding with upload..."
-        
-        # Sync static assets with long cache (JS, CSS, images)
-        echo "📤 Uploading static assets..."
-        aws s3 sync "$BUILD_DIR/" s3://${{ steps.terraform.outputs.bucket_name }} \
-          --delete \
-          --cache-control "public,max-age=31536000,immutable" \
-          --exclude "*.html" \
-          --exclude "*.json" \
-          --exclude "*.txt"
-        
-        # Sync HTML, JSON, and other dynamic files with no cache
-        echo "📤 Uploading dynamic files..."
-        aws s3 sync "$BUILD_DIR/" s3://${{ steps.terraform.outputs.bucket_name }} \
-          --cache-control "public,max-age=0,must-revalidate" \
-          --include "*.html" \
-          --include "*.json" \
-          --include "*.txt"
-          
-        echo "✅ Files uploaded to S3"
-        echo "📋 S3 bucket contents:"
-        aws s3 ls s3://${{ steps.terraform.outputs.bucket_name }} --recursive | head -10
-
-    - name: Invalidate CloudFront cache
-      run: |
-        echo "🔄 Invalidating CloudFront cache..."
-        aws cloudfront create-invalidation \
-          --distribution-id ${{ steps.terraform.outputs.cloudfront_distribution_id }} \
-          --paths "/*"
-        echo "✅ Cache invalidation initiated"
-
-    - name: Deployment complete
-      run: |
-        echo "🎉 Deployment successful!"
-        echo "🌐 Your app is available at: https://${{ steps.terraform.outputs.cloudfront_domain }}"
-        echo "⏱️  Note: CloudFront changes may take 5-15 minutes to propagate globally"
-        echo "🔧 S3 Bucket: ${{ steps.terraform.outputs.bucket_name }}"
-        echo "📡 CloudFront Distribution: ${{ steps.terraform.outputs.cloudfront_distribution_id }}"
