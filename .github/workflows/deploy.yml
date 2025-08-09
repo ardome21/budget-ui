@@ -8,6 +8,9 @@ on:
 env:
   NODE_VERSION: '18'  # Adjust based on your Angular version requirements
   AWS_REGION: 'us-east-1'
+  TF_VAR_bucket_name: 'my-angular-app-dev'
+  TF_VAR_acm_certificate_arn: 'arn:aws:acm:us-east-1:326460268386:certificate/aa33fde1-8424-411c-9edc-5331f4497f5d'
+  TF_VAR_domain_name: "budgetapplication.com"
 
 jobs:
   deploy:
