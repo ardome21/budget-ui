@@ -8,7 +8,7 @@ on:
 env:
   NODE_VERSION: '18'
   AWS_REGION: 'us-east-1'
-  TF_VAR_bucket_name: 'my-angular-app-dev-1'
+  TF_VAR_bucket_name: 'my-angular-app-dev-2'
 
 jobs:
   deploy:
@@ -28,29 +28,31 @@ jobs:
       run: |
         npm ci
         npm run build
+        ls -la
+        find . -name "dist" -type d || echo "No dist folder found"
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: ${{ env.AWS_REGION }}
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ~1.3
-        terraform_wrapper: false
+    # - name: Setup Terraform
+    #   uses: hashicorp/setup-terraform@v3
+    #   with:
+    #     terraform_version: ~1.3
+    #     terraform_wrapper: false
 
-    - name: Deploy infrastructure
-      run: |
-        terraform init
-        terraform apply -auto-approve
-      working-directory: .aws/terraform
+    # - name: Deploy infrastructure
+    #   run: |
+    #     terraform init
+    #     terraform apply -auto-approve
+    #   working-directory: .aws/terraform
 
-    - name: Upload to S3
-      run: |
-        BUCKET_NAME=$(terraform output -raw bucket_name)
-        aws s3 sync dist/ s3://$BUCKET_NAME --delete
-        echo "Deployed to: $BUCKET_NAME"
-      working-directory: .aws/terraform
+    # - name: Upload to S3
+    #   run: |
+    #     BUCKET_NAME=$(terraform output -raw bucket_name)
+    #     aws s3 sync dist/ s3://$BUCKET_NAME --delete
+    #     echo "Deployed to: $BUCKET_NAME"
+    #   working-directory: .aws/terraform
