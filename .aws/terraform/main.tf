@@ -16,14 +16,15 @@ variable "bucket_name" {
   type = string
 }
 
-variable "acm_certificate_arn" {
-  type = string
-}
-
-variable "domain_name" {
-  type        = string
-  description = "The domain name for the site (e.g., myapp.example.com)"
-}
+# Remove these variables for now
+# variable "acm_certificate_arn" {
+#   type = string
+# }
+# 
+# variable "domain_name" {
+#   type        = string
+#   description = "The domain name for the site (e.g., myapp.example.com)"
+# }
 
 #######################
 # S3 bucket (private)
@@ -106,9 +107,10 @@ resource "aws_s3_bucket_policy" "policy" {
 resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   default_root_object = "index.html"
-  aliases             = [var.domain_name]
+  # Remove custom domain for now
+  # aliases             = [var.domain_name]
 
-  origin {
+  origins {
     domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
     origin_id                = "s3-${aws_s3_bucket.site.id}"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
@@ -176,10 +178,9 @@ resource "aws_cloudfront_distribution" "cdn" {
 
   price_class = "PriceClass_100"
 
+  # Use default CloudFront certificate instead of custom
   viewer_certificate {
-    acm_certificate_arn      = var.acm_certificate_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    cloudfront_default_certificate = true
   }
 
   restrictions {
