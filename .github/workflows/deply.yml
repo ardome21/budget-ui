@@ -10,8 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -22,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Build Angular
-        run: npm run build --prod
+        run: npm run prod
 
       - name: Get Terraform outputs
         id: tf
@@ -33,7 +38,7 @@ jobs:
           echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
 
       - name: Upload to S3
-        run: aws s3 sync dist/my-angular-app/ s3://${{ steps.tf.outputs.bucket }} --delete
+        run: aws s3 sync dist/budget-ui/ s3://${{ steps.tf.outputs.bucket }} --delete
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
