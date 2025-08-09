@@ -16,16 +16,6 @@ variable "bucket_name" {
   type = string
 }
 
-# Remove these variables for now
-# variable "acm_certificate_arn" {
-#   type = string
-# }
-# 
-# variable "domain_name" {
-#   type        = string
-#   description = "The domain name for the site (e.g., myapp.example.com)"
-# }
-
 #######################
 # S3 bucket (private)
 #######################
@@ -94,17 +84,16 @@ data "aws_iam_policy_document" "bucket_policy" {
       variable = "AWS:SourceAccount"
       values   = [data.aws_caller_identity.current.account_id]
     }
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values   = [aws_cloudfront_distribution.cdn.arn]
-    }
   }
 }
 
 data "aws_caller_identity" "current" {}
 
+resource "aws_s3_bucket_policy" "policy" {
+  bucket = aws_s3_bucket.site.id
+  policy = data.aws_iam_policy_document.bucket_policy.json
+  depends_on = [aws_cloudfront_distribution.cdn]
+}
 
 #######################
 # CloudFront Distribution
@@ -112,8 +101,6 @@ data "aws_caller_identity" "current" {}
 resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   default_root_object = "index.html"
-  # Remove custom domain for now
-  # aliases             = [var.domain_name]
 
   origin {
     domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
@@ -122,7 +109,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   default_cache_behavior {
-    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = "s3-${aws_s3_bucket.site.id}"
     viewer_protocol_policy = "redirect-to-https"
@@ -140,7 +127,6 @@ resource "aws_cloudfront_distribution" "cdn" {
     max_ttl                = 86400
   }
 
-  # Cache behavior for static assets
   ordered_cache_behavior {
     path_pattern     = "*.js"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
@@ -156,8 +142,8 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
 
     min_ttl                = 0
-    default_ttl            = 31536000  # 1 year
-    max_ttl                = 31536000  # 1 year
+    default_ttl            = 31536000
+    max_ttl                = 31536000
     viewer_protocol_policy = "redirect-to-https"
   }
 
@@ -176,14 +162,13 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
 
     min_ttl                = 0
-    default_ttl            = 31536000  # 1 year
-    max_ttl                = 31536000  # 1 year
+    default_ttl            = 31536000
+    max_ttl                = 31536000
     viewer_protocol_policy = "redirect-to-https"
   }
 
   price_class = "PriceClass_100"
 
-  # Use default CloudFront certificate instead of custom
   viewer_certificate {
     cloudfront_default_certificate = true
   }
@@ -194,7 +179,6 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
-  # Custom error pages for Angular SPA routing
   custom_error_response {
     error_code         = 403
     response_code      = 200
