@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
+      identifiers = [aws_cloudfront_origin_access_control.oac.iam_arn]
     }
 
     actions   = ["s3:GetObject"]
