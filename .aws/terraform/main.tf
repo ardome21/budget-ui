@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
     principals {
       type        = "Service"
-      identifiers = [aws_cloudfront_origin_access_control.oac.iam_arn]
+      identifiers = ["cloudfront.amazonaws.com"]
     }
 
     actions   = ["s3:GetObject"]
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "bucket_policy" {
 
     condition {
       test     = "StringEquals"
-      variable = "AWS:SourceArn"
+      variable = "aws:SourceArn"
       values   = [aws_cloudfront_distribution.cdn.arn]
     }
   }
