@@ -9,7 +9,7 @@ env:
   NODE_VERSION: '18'  # Adjust based on your Angular version requirements
   AWS_REGION: 'us-east-1'
   # Terraform variables
-  TF_VAR_bucket_name: 'my-angular-app-dev-v1'
+  TF_VAR_bucket_name: 'my-angular-app-dev-v2'
 
 jobs:
   deploy:
@@ -105,8 +105,16 @@ jobs:
           # Check if there's a subdirectory in dist (common with newer Angular)
           SUBDIRS=$(find dist -mindepth 1 -maxdepth 1 -type d)
           if [ -n "$SUBDIRS" ] && [ $(echo "$SUBDIRS" | wc -l) -eq 1 ]; then
-            BUILD_DIR="$SUBDIRS"
-            echo "📁 Using Angular project subdirectory: $BUILD_DIR"
+            PROJECT_DIR="$SUBDIRS"
+            echo "📁 Found Angular project directory: $PROJECT_DIR"
+            # Check if there's a browser subdirectory (Angular 17+)
+            if [ -d "$PROJECT_DIR/browser" ]; then
+              BUILD_DIR="$PROJECT_DIR/browser"
+              echo "📁 Using browser subdirectory: $BUILD_DIR"
+            else
+              BUILD_DIR="$PROJECT_DIR"
+              echo "📁 Using project directory: $BUILD_DIR"
+            fi
           else
             BUILD_DIR="dist"
             echo "📁 Using dist directory: $BUILD_DIR"
@@ -120,7 +128,7 @@ jobs:
         ls -la "$BUILD_DIR"
         
         # Verify index.html exists
-        if [ ! -f "$BUILD_DIR/browser/index.html" ]; then
+        if [ ! -f "$BUILD_DIR/index.html" ]; then
           echo "❌ index.html not found in $BUILD_DIR"
           echo "Contents:"
           find "$BUILD_DIR" -name "*.html" | head -5
