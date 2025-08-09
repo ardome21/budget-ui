@@ -8,7 +8,7 @@ on:
 env:
   NODE_VERSION: '18'
   AWS_REGION: 'us-east-1'
-  TF_VAR_bucket_name: 'my-angular-app-dev-v2'
+  TF_VAR_bucket_name: 'my-angular-app-dev-v1'
 
 jobs:
   deploy:

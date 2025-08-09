@@ -75,6 +75,39 @@ resource "aws_cloudfront_origin_access_control" "oac" {
 #######################
 # Bucket Policy for OAC
 #######################
+
+data "aws_iam_policy_document" "bucket_policy" {
+  statement {
+    sid    = "AllowCloudFrontRead"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.site.arn}/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.cdn.arn]
+    }
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
+
+###
+
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
     sid    = "AllowCloudFrontRead"
