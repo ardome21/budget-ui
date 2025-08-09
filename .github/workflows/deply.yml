@@ -1,0 +1,47 @@
+name: Deploy Angular Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular
+        run: npm run build --prod
+
+      - name: Get Terraform outputs
+        id: tf
+        run: |
+          BUCKET=$(terraform -chdir=infra output -raw frontend_bucket_name)
+          DIST_ID=$(terraform -chdir=infra output -raw cloudfront_distribution_id)
+          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+          echo "dist_id=$DIST_ID" >> $GITHUB_OUTPUT
+
+      - name: Upload to S3
+        run: aws s3 sync dist/my-angular-app/ s3://${{ steps.tf.outputs.bucket }} --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id ${{ steps.tf.outputs.dist_id }} --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
