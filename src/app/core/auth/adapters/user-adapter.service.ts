@@ -10,6 +10,9 @@ export class UserAdapterService {
   constructor() { }
 
   fromData(userData: UserData): UserProfile {
+    if (!userData.user_id) {
+      throw new Error('User ID is required');
+    }
     return {
       email: userData.email,
       userId: userData.user_id,
