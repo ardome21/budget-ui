@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { PlaidApiService } from '../../repository/service/plaid-api.service';
+import { AuthService } from '../auth/services/auth.service';
+import { filter, take, tap } from 'rxjs';
 
 declare var Plaid: any;
 
@@ -8,14 +10,24 @@ declare var Plaid: any;
 })
 export class PlaidService {
 
-  userId: string = 'unique_user_id_123'; // TODO: Get User ID from User service
+  userId!: string | undefined
 
-  constructor(private plaidApi: PlaidApiService) {}
+  constructor(
+    private plaidApi: PlaidApiService, private _authService: AuthService) {}
 
-launchPlaidLink(onComplete: (accessToken: string) => void): void {
-    const userId = this.userId
+  private hasValidProfile(profile: any): profile is { userId: string } {
+    return profile && typeof profile.userId === 'string' && profile.userId.length > 0;
+  }
 
-    this.plaidApi.createLinkToken(userId).subscribe({
+  launchPlaidLink(onComplete: (accessToken: string) => void): void {
+    this._authService.userProfile$.pipe(
+      filter(this.hasValidProfile),
+      take(1)
+    ).subscribe({
+      next: (profile) => {
+        const userId = profile.userId;
+        
+        this.plaidApi.createLinkToken(userId).subscribe({
       next: (res) => {
         const handler = Plaid.create({
           token: res.link_token,
@@ -33,9 +45,14 @@ launchPlaidLink(onComplete: (accessToken: string) => void): void {
         });
 
         handler.open();
+          },
+          error: (err: any) => {
+            console.error('Failed to create link_token:', err);
+          }
+        });
       },
       error: (err: any) => {
-        console.error('Failed to create link_token:', err);
+        console.error('Failed to get user profile:', err);
       }
     });
   }

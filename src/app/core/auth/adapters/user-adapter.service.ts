@@ -12,6 +12,7 @@ export class UserAdapterService {
   fromData(userData: UserData): UserProfile {
     return {
       email: userData.email,
+      userId: userData.user_id,
       firstName: userData.first_name,
       lastName: userData.last_name
     }
