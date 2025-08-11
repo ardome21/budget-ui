@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class PlaidApiService {
 
-  private baseurl = 'https://vqcu8k72rl.execute-api.us-east-1.amazonaws.com'
+  private baseurl = 'https://pqnibwgrl2.execute-api.us-east-1.amazonaws.com'
   constructor(private http: HttpClient) { }
 
   createLinkToken(userId: string): Observable<{ link_token: string }> {
@@ -33,9 +33,8 @@ export class PlaidApiService {
       {
         user_id: 'UID001',
         institution: 'Chase'
-      }
-      // ,
-      // { withCredentials: true }
+      },
+      { withCredentials: true }
     );
   }
 }

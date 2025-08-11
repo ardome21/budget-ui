@@ -20,20 +20,20 @@ export class AuthService {
 
   private _authApiService = inject(AuthApiService);
   private _authAdapterService = inject(UserAdapterService)
-
+  
   constructor() {
     this.checkAuthStatus().subscribe({
       next: () => this._authChecked.next(true),
       error: () => this._authChecked.next(true)
-    });
+            });
   }
-
+  
   createUser(
     userData: UserData
   ): Observable<{message: string, user: UserData, success: string}> {
     return this._authApiService.createUser(userData)
   }
-
+  
   login(
     loginData: {email: string, password: string}
   ): Observable<{message: string, user: UserData, success: string}> {
@@ -44,22 +44,22 @@ export class AuthService {
       })
     );
   }
-
+  
   logout(): void {
     this._authApiService.logout().subscribe(() => {
       this._userProfile.next(null);
     });
   }
-
+  
   checkAuthStatus(): Observable<UserProfile | null> {
     return this._authApiService.verifyAuth().pipe(
       tap((res) => {
-          if (res.success === 'true') {
-            const userProfile = this._authAdapterService.fromData(res.userData);
-            this._userProfile.next(userProfile);
-          } else {
-            this._userProfile.next(null);
-          }
+        if (res.success === 'true') {
+          const userProfile = this._authAdapterService.fromData(res.userData);
+          this._userProfile.next(userProfile);
+        } else {
+          this._userProfile.next(null);
+        }
       }),
       map(res => res.success === 'true'
         ? this._authAdapterService.fromData(res.userData)

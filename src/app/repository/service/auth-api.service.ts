@@ -8,7 +8,7 @@ import { UserData } from '../types/user-data';
 })
 export class AuthApiService {
 
-  private baseUrl = 'https://rci0hqwbeh.execute-api.us-east-1.amazonaws.com'
+  private baseUrl = 'https://pqnibwgrl2.execute-api.us-east-1.amazonaws.com'
 
   constructor(private http: HttpClient) { }
 
@@ -29,20 +29,20 @@ export class AuthApiService {
 
   login(
     loginData: {email: string, password: string}
-  ): Observable<{message: string; user: UserData; success: string}>{
+  ): Observable<{message: string; user: UserData; success: string; token: string}>{
     const payload = {
       "email": loginData.email,
       "password": loginData.password
     }
-    return this.http.post<{message: string; user: UserData; success: string}>(
+    return this.http.post<{message: string; user: UserData; success: string; token: string}>(
       this.baseUrl + '/login',
       payload,
       { withCredentials: true }
     );
   }
 
-  verifyAuth(): Observable<{message: string; userData: UserData; success: string}> {
-    return this.http.get<{message: string; userData: UserData; success: string}>(
+  verifyAuth(): Observable<{message: string; userData: UserData; success: string; token: string}> {
+    return this.http.get<{message: string; userData: UserData; success: string; token: string}>(
       this.baseUrl + '/login', { withCredentials: true }
      );
   }
