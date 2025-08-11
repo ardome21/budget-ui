@@ -27,4 +27,8 @@ export class HomeComponent {
       });
     });
   }
+
+  getAccountDetails() {
+    this.plaid.getAccountDetails().subscribe(res => console.log("Get Account: " + res));
+  }
 }

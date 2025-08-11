@@ -68,5 +68,9 @@ export class PlaidService {
     );
   }
 
+  getAccountDetails(){
+    return this.plaidApi.getAccountDetails();
+  }
+
 }
 
