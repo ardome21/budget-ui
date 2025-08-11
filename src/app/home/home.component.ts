@@ -1,20 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, inject, Inject } from '@angular/core';
 import { PlaidService } from '../core/services/plaid.service';
+import { MatSnackBar  } from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
 
-  constructor(private plaid: PlaidService) {}
+  isConnectingToBank$! : Observable<boolean>
 
+  
+  constructor(private plaid: PlaidService, private snackbar: MatSnackBar) {
+      this.isConnectingToBank$ = this.plaid.isConnectingToBank$;
+  }
+  
   connectBank() {
-    this.plaid.launchPlaidLink((accessToken: string) => {
-      console.log('🎉 Received Plaid access token:', accessToken);
+    this.plaid.launchPlaidLink().subscribe(res => {
+      this.snackbar.open(res.message, 'Close', {
+        duration: 3000,
+        panelClass: res.success ? 'snackbar-success' : 'snackbar-error'
+      });
     });
   }
-
 }

@@ -1,1 +1,5 @@
-<button (click)="connectBank()">Connect Bank</button>
+<button 
+  (click)="connectBank()" 
+  [disabled]="isConnectingToBank$ | async">
+  {{ (isConnectingToBank$ | async)  ? 'Connecting…' : 'Connect Bank' }}
+</button>

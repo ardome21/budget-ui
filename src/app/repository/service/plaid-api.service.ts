@@ -17,10 +17,13 @@ export class PlaidApiService {
     );
   }
 
-  exchangePublicToken(publicToken: string): Observable<{ access_token: string; item_id: string }> {
-    return this.http.post<{ access_token: string; item_id: string }>(
+  exchangePublicToken(userId: string, public_token: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
      this.baseurl + '/exchange-plaid-token',
-      { public_token: publicToken }
+      {
+        user_id: userId,
+        public_token: public_token
+      }
     );
   }
 }

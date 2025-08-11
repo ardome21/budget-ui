@@ -1,5 +1,7 @@
 <header>
-  <img class="logo" src="assets/header-logo.png" alt="logo">
+  <a href="/">
+    <img class="logo" src="assets/header-logo.png" alt="logo">
+  </a>
   <p class="title">Budget Application</p>
   <ng-container *ngIf="authChecked$ | async as isAuthChecked; else authLoading">
     <div class="user-section">
