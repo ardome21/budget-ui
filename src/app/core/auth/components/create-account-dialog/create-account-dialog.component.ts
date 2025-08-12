@@ -63,9 +63,9 @@ export class CreateAccountDialogComponent {
       last_name: this.f['lastName'].value
     };
     this._userService.createUser(userData).subscribe({
-    next: () => {
+    next: (res) => {
       this.dialogRef.close()
-      this.snackBar.open('Account Created! Please verify your email', 'Close', { duration: 6000, panelClass: 'snackbar-info' });
+      this.snackBar.open(res.message, 'Close', { duration: 6000, panelClass: 'snackbar-info' });
     },
     error: (res) => {
       this.isLoading = false;

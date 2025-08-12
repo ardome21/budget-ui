@@ -29,15 +29,13 @@ export class PlaidService {
       tap(() => this._isConnectingToBank.next(true)),
       filter(this.hasValidProfile),
       take(1),
-      switchMap(profile => {
-        const userId = profile.userId;
-
-        return this.plaidApi.createLinkToken(userId).pipe(
+      switchMap(() =>
+        this.plaidApi.createLinkToken().pipe(
           switchMap(res => new Observable<{ success: boolean; message: string }>(observer => {
             const handler = Plaid.create({
               token: res.link_token,
               onSuccess: (public_token: string) => {
-                this.plaidApi.exchangePublicToken(userId, public_token).subscribe({
+                this.plaidApi.exchangePublicToken(public_token).subscribe({
                   next: exchange => {
                     observer.next({ success: true, message: exchange.message || 'Bank connected successfully' });
                     observer.complete();
@@ -49,33 +47,25 @@ export class PlaidService {
                 });
               },
               onExit: (err: any) => {
-                if (err) {
-                  observer.next({ success: false, message: 'Plaid exited with error' });
-                } else {
-                  observer.next({ success: false, message: 'Plaid flow exited' });
-                }
+                observer.next({
+                  success: false,
+                  message: err ? 'Plaid exited with error' : 'Plaid flow exited'
+                });
                 observer.complete();
               }
             });
 
             handler.open();
-          })),
-        );
-      }),
+          }))
+        )
+      ),
       finalize(() => this._isConnectingToBank.next(false))
     );
   }
 
+
   getAccountDetails(institution: string): Observable<any>{
-    return this._authService.userProfile$.pipe(
-      tap(() => this._isConnectingToBank.next(true)),
-      filter(this.hasValidProfile),
-      take(1),
-      switchMap(profile => {
-        return this.plaidApi.getAccountDetails(profile.userId, institution)
-      }),
-      finalize(() => this._isConnectingToBank.next(false) )
-    )
+    return this.plaidApi.getAccountDetails(institution)
   }
 
 }

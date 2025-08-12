@@ -54,14 +54,14 @@ export class AuthService {
   checkAuthStatus(): Observable<UserProfile | null> {
     return this._authApiService.verifyAuth().pipe(
       tap((res) => {
-        if (res.success === 'true') {
+        if (res.success === true) {
           const userProfile = this._authAdapterService.fromData(res.userData);
           this._userProfile.next(userProfile);
         } else {
           this._userProfile.next(null);
         }
       }),
-      map(res => res.success === 'true'
+      map(res => res.success === true
         ? this._authAdapterService.fromData(res.userData)
         : null
       ),

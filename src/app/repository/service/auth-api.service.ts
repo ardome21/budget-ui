@@ -41,8 +41,8 @@ export class AuthApiService {
     );
   }
 
-  verifyAuth(): Observable<{message: string; userData: UserData; success: string; token: string}> {
-    return this.http.get<{message: string; userData: UserData; success: string; token: string}>(
+  verifyAuth(): Observable<{message: string; userData: UserData; success: boolean; token: string}> {
+    return this.http.get<{message: string; userData: UserData; success: boolean; token: string}>(
       this.baseUrl + '/login', { withCredentials: true }
      );
   }
