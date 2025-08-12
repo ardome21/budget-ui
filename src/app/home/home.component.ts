@@ -3,16 +3,18 @@ import { PlaidService } from '../core/services/plaid.service';
 import { MatSnackBar  } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
 
   isConnectingToBank$! : Observable<boolean>
+  institution: string = ''
 
   
   constructor(private plaid: PlaidService, private snackbar: MatSnackBar) {
@@ -29,6 +31,6 @@ export class HomeComponent {
   }
 
   getAccountDetails() {
-    this.plaid.getAccountDetails().subscribe(res => console.log("Get Account: " + res));
+    this.plaid.getAccountDetails(this.institution).subscribe(res => console.log("Get Account: " + res));
   }
 }

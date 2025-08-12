@@ -14,14 +14,14 @@ export class AuthApiService {
 
   createUser(
     userData: UserData
-  ): Observable<{message: string; user: UserData; success: string}>{
+  ): Observable<{message: string; user: UserData}>{
     const payload = {
       "email": userData.email,
       "first_name": userData.first_name,
       "last_name": userData.last_name,
       "password": userData.password
     }
-    return this.http.post<{message: string; user: UserData; success: string}>(
+    return this.http.post<{message: string; user: UserData}>(
       this.baseUrl + '/sign-up',
       payload
     );

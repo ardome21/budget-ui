@@ -27,12 +27,12 @@ export class PlaidApiService {
     );
   }
 
-  getAccountDetails():Observable<any>{
+  getAccountDetails(userId: string, institution: string):Observable<any>{
     return this.http.post<any>(
       this.baseurl + '/get-account-details',
       {
-        user_id: 'UID001',
-        institution: 'Chase'
+        user_id: userId,
+        institution: institution
       },
       { withCredentials: true }
     );

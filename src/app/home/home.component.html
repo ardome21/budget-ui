@@ -1,7 +1,31 @@
+<div>
+  <h3>Accounts</h3>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Insitution</th>
+      <th>Type</th>
+      <th>Balance</th>
+    </tr>
+    <tr>
+      <td>Chase Checkings</td>
+      <td>Chase</td>
+      <td>Checkings</td>
+      <td>100</td>
+    </tr>
+  </table>
+</div>
+<hr>
 <button 
   (click)="connectBank()" 
   [disabled]="isConnectingToBank$ | async">
   {{ (isConnectingToBank$ | async)  ? 'Connecting…' : 'Connect Bank' }}
 </button>
-<button
-  (click)="getAccountDetails()">Get Account Details</button>
+
+<div>
+  <p>Enter Insitution</p> 
+  <input [(ngModel)]="institution" placeholder="Institution Name" >
+  <button
+    (click)="getAccountDetails()">Get Account Details
+  </button>
+</div>

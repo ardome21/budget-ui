@@ -10,8 +10,6 @@ declare var Plaid: any;
 })
 export class PlaidService {
 
-  userId!: string | undefined
-
   private _isConnectingToBank = new BehaviorSubject<boolean>(false);
   isConnectingToBank$ = this._isConnectingToBank.asObservable();
 
@@ -64,12 +62,20 @@ export class PlaidService {
           })),
         );
       }),
-      finalize(() => this._isConnectingToBank.next(false)) // stop loading
+      finalize(() => this._isConnectingToBank.next(false))
     );
   }
 
-  getAccountDetails(){
-    return this.plaidApi.getAccountDetails();
+  getAccountDetails(institution: string): Observable<any>{
+    return this._authService.userProfile$.pipe(
+      tap(() => this._isConnectingToBank.next(true)),
+      filter(this.hasValidProfile),
+      take(1),
+      switchMap(profile => {
+        return this.plaidApi.getAccountDetails(profile.userId, institution)
+      }),
+      finalize(() => this._isConnectingToBank.next(false) )
+    )
   }
 
 }

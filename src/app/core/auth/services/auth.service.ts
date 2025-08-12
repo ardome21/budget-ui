@@ -30,7 +30,7 @@ export class AuthService {
   
   createUser(
     userData: UserData
-  ): Observable<{message: string, user: UserData, success: string}> {
+  ): Observable<{message: string, user: UserData}> {
     return this._authApiService.createUser(userData)
   }
   
